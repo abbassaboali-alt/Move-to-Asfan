@@ -550,60 +550,13 @@ tr.dup-row{background:#ffebee !important}
 
 <script>
 /* ================= Logout + Protection ================= */
-
-function goLogin(){
-  localStorage.clear();
-  sessionStorage.clear();
-  location.replace("https://www.prudle-education.com/log-in-out");
-}
-
 function logout(){
-
-  localStorage.clear();
-  sessionStorage.clear();
-
-  if(window.parent && window.parent !== window){
-    window.parent.postMessage("PRUDLE_LOGOUT","*");
-  }
-
-  location.replace("https://www.prudle-education.com/log-in-out");
+  localStorage.removeItem("username");
+  localStorage.removeItem("role");
+  localStorage.removeItem("loginDate");
+  location.href="https://www.prudle-education.com/log-in_out.html";
 }
-
-function checkAccess(){
-
-  const user = localStorage.getItem("username");
-
-  const role = String(
-    localStorage.getItem("role") || ""
-  ).trim().toLowerCase();
-
-  const last = localStorage.getItem("loginDate");
-  const today = new Date().toDateString();
-
-  if(!user || !role || last !== today){
-    goLogin();
-    return false;
-  }
-
-  return true;
-}
-
 (function(){
-
-  if(
-    location.hostname.includes("editmysite") ||
-    location.hostname.includes("weebly")
-  ) return;
-
-  if(!checkAccess()){
-    throw new Error("Access Denied");
-  }
-
-})();
-
-window.addEventListener("pageshow",()=>{
-  checkAccess();
-});
   // استثناء محرر Weebly
   if(location.hostname.includes("editmysite") || location.hostname.includes("weebly")) return;
 
@@ -612,13 +565,13 @@ window.addEventListener("pageshow",()=>{
   const last = localStorage.getItem("loginDate");
 
   if(!user || !role){
-    location.href="https://www.prudle-education.com/log-in-out";
+    location.href="https://www.prudle-education.com/log-in_out.html";
     return;
   }
   const today = new Date().toDateString();
   if(last !== today){
     localStorage.clear();
-    location.href="https://www.prudle-education.com/log-in-out";
+    location.href="https://www.prudle-education.com/log-in_out.html";
     return;
   }
 })();
@@ -947,8 +900,8 @@ async function loadData(){
   hint.textContent="";
   tbody.innerHTML = `<tr><td colspan="23" class="notice">جاري التحميل...</td></tr>`;
 
- const baseA = [["Branch","==","Asfan"],["CourseType","==","حضوري"]];
-const baseB = [["branch","==","Asfan"],["mode","==","حضوري"]];
+  const baseA = [["Branch","==","Asfan"],["CourseType","==","حضوري"]];
+  const baseB = [["branch","==","Asfan"],["mode","==","حضوري"]];
 
   const [frSnap, fpSnap] = await Promise.all([
     queryWithFallback("FakeRegistrations", baseA, baseB),
@@ -961,12 +914,7 @@ const baseB = [["branch","==","Asfan"],["mode","==","حضوري"]];
     const br = x.Branch || x.branch || "";
     const sec= x.Section || x.section || "";
     const typ= x.CourseType || x.mode || "";
-   if(
-  br!=="Asfan" &&
-  br!=="عسفان"
-) return;
-
-if(typ!=="حضوري") return;
+    if(br!=="Asfan" || typ!=="حضوري") return;
 
 const courseName = getCourseName(x);
 const period = getPeriod(x);
@@ -1021,12 +969,7 @@ fpSnap.forEach(d=>{
   const br = x.Branch || x.branch || "";
   const sec= x.Section || x.section || "";
   const typ= x.CourseType || x.mode || "";
-   if(
-  br!=="Asfan" &&
-  br!=="عسفان"
-) return;
-
-if(typ!=="حضوري") return;
+    if(br!=="Asfan" || typ!=="حضوري") return;
 
   const gRaw = (x.grade ?? x.finalGrade ?? x.final ?? x.totalGrade);
   const g = Number(gRaw);
