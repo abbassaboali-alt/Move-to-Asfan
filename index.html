@@ -556,25 +556,7 @@ function logout(){
   localStorage.removeItem("loginDate");
   location.href="https://www.prudle-education.com/log-in-out";
 }
-(function(){
-  // استثناء محرر Weebly
-  if(location.hostname.includes("editmysite") || location.hostname.includes("weebly")) return;
 
-  const user = localStorage.getItem("username");
-  const role = localStorage.getItem("role");
-  const last = localStorage.getItem("loginDate");
-
-  if(!user || !role){
-    location.href="https://www.prudle-education.com/log-in-out";
-    return;
-  }
-  const today = new Date().toDateString();
-  if(last !== today){
-    localStorage.clear();
-    location.href="https://www.prudle-education.com/log-in-out";
-    return;
-  }
-})();
 
 /* ================= Prevent Submit (Weebly) ================= */
 document.addEventListener("submit", function(e){
