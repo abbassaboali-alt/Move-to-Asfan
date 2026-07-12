@@ -551,10 +551,32 @@ tr.dup-row{background:#ffebee !important}
 <script>
 /* ================= Logout + Protection ================= */
 function logout(){
-  localStorage.removeItem("username");
-  localStorage.removeItem("role");
-  localStorage.removeItem("loginDate");
-  location.href="https://www.prudle-education.com/log-in-out";
+
+  /* حذف بيانات GitHub نفسها */
+  localStorage.clear();
+  sessionStorage.clear();
+
+  /*
+    إذا كانت الصفحة داخل iframe:
+    نرسل أمر الخروج إلى صفحة Prudle الحاضنة،
+    وهي التي تحذف تسجيل الدخول الحقيقي وتعيد التوجيه.
+  */
+  if(window.parent !== window){
+
+    window.parent.postMessage(
+      "PRUDLE_LOGOUT",
+      "https://www.prudle-education.com"
+    );
+
+    return;
+  }
+
+  /*
+    إذا تم فتح صفحة GitHub مباشرة.
+  */
+  window.location.replace(
+    "https://www.prudle-education.com/log-in-out"
+  );
 }
 
 
