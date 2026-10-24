@@ -1,0 +1,44 @@
+<!-- Prudle — Move-to-Asfan | Admin-only embed for Webflow -->
+<div id="prudle-asfan-auth-message" style="padding:28px;text-align:center;font-family:Tajawal,Arial,sans-serif;color:#164478">جاري التحقق من صلاحية المدير...</div>
+<iframe id="prudle-asfan-frame" title="ترحيل الطلاب - عسفان" allow="microphone; camera" style="display:none;width:100%;height:100vh;border:none" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+<script>
+(function(){
+  'use strict';
+  const LOGIN_URL='https://www.prudle-education.com/log-in-out';
+  const APP_URL='https://abbassaboali-alt.github.io/Move-to-Asfan/';
+  const APP_ORIGIN='https://abbassaboali-alt.github.io';
+  const frame=document.getElementById('prudle-asfan-frame');
+  const message=document.getElementById('prudle-asfan-auth-message');
+  let redirecting=false;
+
+  function logoutAll(){
+    if(redirecting)return;
+    redirecting=true;
+    frame.style.display='none';
+    frame.removeAttribute('src');
+    localStorage.clear();
+    sessionStorage.clear();
+    try{window.top.location.replace(LOGIN_URL);}catch(e){window.location.replace(LOGIN_URL);}
+  }
+
+  function checkLoginOnly(){
+    const user=localStorage.getItem('username');
+    const role=String(localStorage.getItem('role')||'').trim().toLowerCase();
+    const last=localStorage.getItem('loginDate');
+    const today=new Date().toDateString();
+    if(!user||role!=='admin'||last!==today){logoutAll();return false;}
+    if(!frame.getAttribute('src'))frame.setAttribute('src',APP_URL);
+    frame.style.display='block';
+    message.style.display='none';
+    return true;
+  }
+
+  window.addEventListener('message',function(e){
+    if(e.source===frame.contentWindow && e.origin===APP_ORIGIN && e.data==='PRUDLE_LOGOUT')logoutAll();
+  });
+  window.addEventListener('pageshow',checkLoginOnly);
+  document.addEventListener('visibilitychange',function(){if(!document.hidden)checkLoginOnly();});
+  window.addEventListener('storage',function(e){if(['username','role','loginDate'].includes(e.key)||e.key===null)checkLoginOnly();});
+  checkLoginOnly();
+})();
+</script>
